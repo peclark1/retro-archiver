@@ -24,6 +24,7 @@ For the first proof of concept:
 - Keep the first capture on local SIMH storage.
 - Preserve normal web pages with ArchiveBox's full page-oriented extractor set.
 - Preserve recognized downloadable artifacts primarily as original bytes via wget plus HTTP headers/WARC; skip page rendering extractors for those file URLs.
+- Preserve z80pack `/ftp/` directory indexes as lightweight HTML context: keep headers, wget/WARC, title and local text extraction, but skip repeated browser rendering, media, git, favicon and archive.org work.
 
 ## First-run observations
 
@@ -40,6 +41,12 @@ The scoped retry reached `https://www.icl1900.co.uk/unix4fun/z80pack/ftp/zsdos.t
 This established a second collection rule: direct downloadable artifacts should not receive the same extraction pipeline as HTML pages. Retro Archiver now uses ArchiveBox's per-URL `SAVE_DENYLIST` to skip page/browser extractors for common archive, disk-image, ROM/binary, ISO, and PDF extensions. The `headers` and `wget` extractors remain enabled; wget also writes the WARC record when WARC capture is enabled.
 
 The extension list is intentionally conservative and will be expanded only as real collections expose additional formats.
+
+### FTP directory indexes are context, not rich pages
+
+A later retry reached a directory listing such as `https://www.icl1900.co.uk/unix4fun/z80pack/ftp/source-examples/plm80/`. Because the URL ends in `/` rather than a recognized file extension, ArchiveBox treated it as a normal page and attempted SingleFile/PDF/browser rendering. Those extractors are unnecessary for a simple directory index and can create avoidable timeout delays and additional requests to the source site.
+
+Retro Archiver therefore treats z80pack `/ftp/` directory URLs ending in `/` as a lightweight page class. The listing HTML and link context are still preserved through headers and wget/WARC, and local title/text extraction remains available, but browser-oriented extractors are skipped. This reduces both capture time and load on the source site while retaining the historically useful directory structure.
 
 ## Tags
 
