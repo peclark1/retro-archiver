@@ -4,20 +4,26 @@ set -euo pipefail
 URL='https://www.icl1900.co.uk/unix4fun/z80pack/'
 TAGS='retrocomputing,z80,z80pack,emulator,cpm'
 
+if docker info >/dev/null 2>&1; then
+  DC=(docker compose)
+else
+  DC=(sudo docker compose)
+fi
+
 echo "Retro Archiver: first z80pack capture"
 echo "URL:  ${URL}"
 echo "Tags: ${TAGS}"
 echo
 
 echo "Capturing the seed page and URLs one hop away..."
-docker compose run --rm archivebox add \
+"${DC[@]}" run --rm archivebox add \
   --depth=1 \
   --tag "${TAGS}" \
   "${URL}"
 
 echo
 echo "ArchiveBox status:"
-docker compose run --rm archivebox status || true
+"${DC[@]}" run --rm archivebox status || true
 
 echo
 echo "Local disk usage:"
