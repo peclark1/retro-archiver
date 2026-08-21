@@ -34,6 +34,10 @@ For the first test, keep *all* ArchiveBox data local on the SIMH Ubuntu host. Th
 - Docker Compose v2 (`docker compose`)
 - Enough temporary local disk space for the first capture
 
+### ArchiveBox version
+
+Retro Archiver currently pins ArchiveBox **v0.7.4**, the stable release as of August 2026. The newer v0.9.x line is still prerelease and has a somewhat different CLI/setup flow. We will evaluate it later rather than starting the archive on a development release.
+
 ### Setup
 
 ```bash
@@ -43,11 +47,19 @@ cd retro-archiver
 cp .env.example .env
 mkdir -p data archive
 
-docker compose pull
-docker compose run --rm archivebox init
-docker compose run --rm archivebox install
-docker compose run --rm archivebox manage createsuperuser
-docker compose up -d
+sudo docker compose pull
+sudo docker compose run --rm archivebox init
+sudo docker compose run --rm archivebox manage createsuperuser
+sudo docker compose up -d
+```
+
+ArchiveBox v0.7.4 does **not** use the newer standalone `archivebox install` subcommand. Runtime capture dependencies are already included in the Docker image.
+
+Verify the installation with:
+
+```bash
+sudo docker compose run --rm archivebox version
+sudo docker compose ps
 ```
 
 Then run the first capture:
