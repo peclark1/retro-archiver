@@ -22,7 +22,8 @@ This is a good test because the page is both a useful historical resource and a 
 4. **Separate metadata from bulk storage.** ArchiveBox's database/config will eventually live on the SIMH host's local disk; large archived payloads will live on TrueNAS/ZFS.
 5. **Do not crawl the Internet indiscriminately.** Captures need explicit depth and size limits, with source-specific strategies later for sites such as Bitsavers.
 6. **Local-first preservation.** Captures remain under our control by default. ArchiveBox's automatic submission of every URL to archive.org is disabled unless a collection explicitly opts in.
-7. **GitHub is the source of truth for this project's code and configuration.** Archived third-party content itself does not belong in this repository.
+7. **Treat pages and downloadable artifacts differently.** HTML pages benefit from browser-oriented preservation such as SingleFile, PDF, screenshots, DOM, text extraction, wget, and WARC. Direct file URLs such as ZIP/TGZ archives, disk images, ROMs, binaries, ISOs, and PDFs are preserved primarily as original bytes plus HTTP headers and WARC, without wasting time trying to render them as pages.
+8. **GitHub is the source of truth for this project's code and configuration.** Archived third-party content itself does not belong in this repository.
 
 ## Phase 1: local proof of concept
 
@@ -42,6 +43,21 @@ Retro Archiver currently pins ArchiveBox **v0.7.4**, the stable release as of Au
 ### Privacy / archive.org policy
 
 ArchiveBox v0.7.4 normally enables `SAVE_ARCHIVE_DOT_ORG=True`, which submits captured URLs to the Internet Archive for additional redundancy. Retro Archiver explicitly sets this to **False by default**. A future collection can opt in when an additional public Wayback Machine copy is desirable.
+
+### Downloadable artifact policy
+
+ArchiveBox normally tries its page-oriented extractors against every archived URL. That is useful for web pages, but inefficient for direct downloads such as `.tgz`, `.zip`, disk images, ROM binaries, ISOs, and PDFs.
+
+Retro Archiver uses ArchiveBox's per-URL `SAVE_DENYLIST` so recognized artifact URLs skip browser/page extractors such as SingleFile, PDF rendering, screenshot, DOM, readability, and media extraction. `headers` and `wget` remain enabled; ArchiveBox's wget extractor also produces the WARC record when `SAVE_WARC=True`.
+
+The initial extension set is intentionally conservative:
+
+- archives: `zip`, `tgz`, `tar.gz`, `tar`, `gz`, `bz2`, `xz`, `7z`, `lha`, `lzh`, `arc`, `zoo`, `arj`
+- disk/media images: `img`, `dsk`, `imd`, `td0`, `hfe`, `iso`
+- firmware/binaries: `bin`, `rom`, `hex`
+- documents: `pdf`
+
+We will extend this list as real collections expose additional retrocomputing formats.
 
 ### Setup
 
