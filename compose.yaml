@@ -13,12 +13,19 @@ services:
       # archive.org/Wayback Machine unless explicitly opted in.
       SAVE_ARCHIVE_DOT_ORG: ${SAVE_ARCHIVE_DOT_ORG:-False}
 
-      # Downloadable artifacts are preservation objects, not web pages.
-      # For these URL extensions, skip browser/page-oriented extractors and
-      # preserve the original bytes with headers + wget (which also writes WARC).
-      # Keep this list conservative and extend it as new retro formats appear.
+      # Preservation classes:
+      #
+      # 1. Downloadable artifacts are preservation objects, not web pages.
+      #    Keep headers + wget/WARC and skip page/browser-oriented extractors.
+      #
+      # 2. z80pack /ftp/ directory indexes are useful HTML context, but they do
+      #    not need repeated browser rendering. Keep headers + wget/WARC and
+      #    the local text/title extractors while skipping browser/media work.
+      #
+      # Keep the artifact extension list conservative and extend it as new
+      # retro formats appear.
       SAVE_DENYLIST: >-
-        {"(?i)\\.(zip|tgz|tar\\.gz|tar|gz|bz2|xz|7z|lha|lzh|arc|zoo|arj|img|dsk|imd|td0|hfe|bin|rom|hex|iso|pdf)(?:[?#].*)?$":["favicon","singlefile","pdf","screenshot","dom","title","readability","mercury","htmltotext","git","media","archive_org"]}
+        {"(?i)\\.(zip|tgz|tar\\.gz|tar|gz|bz2|xz|7z|lha|lzh|arc|zoo|arj|img|dsk|imd|td0|hfe|bin|rom|hex|iso|pdf)(?:[?#].*)?$":["favicon","singlefile","pdf","screenshot","dom","title","readability","mercury","htmltotext","git","media","archive_org"],"(?i)^https?://(www\\.)?icl1900\\.co\\.uk/unix4fun/z80pack/ftp(?:/.*)?/$":["favicon","singlefile","pdf","screenshot","dom","git","media","archive_org"]}
     volumes:
       # Keep ArchiveBox DB/config/logs local on the SIMH host.
       - ./data:/data
