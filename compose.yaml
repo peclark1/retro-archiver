@@ -1,6 +1,6 @@
 services:
   archivebox:
-    image: ${ARCHIVEBOX_IMAGE:-archivebox/archivebox:latest}
+    image: ${ARCHIVEBOX_IMAGE:-archivebox/archivebox:0.7.4}
     container_name: retro-archiver
     restart: unless-stopped
     ports:
@@ -8,6 +8,10 @@ services:
     environment:
       CRAWL_MAX_URLS: ${CRAWL_MAX_URLS:-250}
       MEDIA_MAX_SIZE: ${MEDIA_MAX_SIZE:-750m}
+
+      # Retro Archiver is local-first. Do not submit captured URLs to
+      # archive.org/Wayback Machine unless explicitly opted in.
+      SAVE_ARCHIVE_DOT_ORG: ${SAVE_ARCHIVE_DOT_ORG:-False}
     volumes:
       # Keep ArchiveBox DB/config/logs local on the SIMH host.
       - ./data:/data
