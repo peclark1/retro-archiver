@@ -1,0 +1,17 @@
+services:
+  archivebox:
+    image: ${ARCHIVEBOX_IMAGE:-archivebox/archivebox:latest}
+    container_name: retro-archiver
+    restart: unless-stopped
+    ports:
+      - "${ARCHIVEBOX_PORT:-8000}:8000"
+    environment:
+      CRAWL_MAX_URLS: ${CRAWL_MAX_URLS:-250}
+      MEDIA_MAX_SIZE: ${MEDIA_MAX_SIZE:-750m}
+    volumes:
+      # Keep ArchiveBox DB/config/logs local on the SIMH host.
+      - ./data:/data
+
+      # Phase 1 default: ./archive is local.
+      # Phase 2: set ARCHIVE_ROOT to the TrueNAS-backed mount path.
+      - ${ARCHIVE_ROOT:-./archive}:/data/archive
