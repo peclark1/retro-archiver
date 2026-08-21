@@ -21,32 +21,40 @@ For the first proof of concept:
 - This scope includes the site's own `/unix4fun/z80pack/ftp/` download area.
 - External references such as YouTube, GitHub, Bitsavers, SourceForge, etc. remain links/context but are not automatically turned into archive jobs.
 - Cap the crawl at 250 URLs.
-- Use ArchiveBox's normal enabled extractors rather than customizing the extraction pipeline yet.
 - Keep the first capture on local SIMH storage.
-- Review exactly what ArchiveBox preserved before deciding whether to add special handling for downloads, Git repositories, or external sites.
+- Preserve normal web pages with ArchiveBox's full page-oriented extractor set.
+- Preserve recognized downloadable artifacts primarily as original bytes via wget plus HTTP headers/WARC; skip page rendering extractors for those file URLs.
 
-## First-run observation
+## First-run observations
+
+### External crawl scope
 
 The original unrestricted `depth=1` test immediately demonstrated why crawl scope matters: ArchiveBox discovered an external YouTube channel link and began running its normal extractors against that page. The SingleFile extractor timed out after 60 seconds while rendering the YouTube channel. This was not a failure of the z80pack site itself; it showed that following all external links one hop away is too broad for the intended Retro Archiver workflow.
 
 The capture script was therefore changed to pass an ArchiveBox `URL_ALLOWLIST` regex that limits recursive URLs to the z80pack subtree while preserving external links in the archived source page for later review or separate collection handling.
 
+### Downloadable artifacts are not pages
+
+The scoped retry reached `https://www.icl1900.co.uk/unix4fun/z80pack/ftp/zsdos.tgz`. ArchiveBox correctly discovered the file, but then ran page-oriented extractors against it. SingleFile failed and the PDF extractor timed out after 60 seconds because a `.tgz` archive is not a renderable page.
+
+This established a second collection rule: direct downloadable artifacts should not receive the same extraction pipeline as HTML pages. Retro Archiver now uses ArchiveBox's per-URL `SAVE_DENYLIST` to skip page/browser extractors for common archive, disk-image, ROM/binary, ISO, and PDF extensions. The `headers` and `wget` extractors remain enabled; wget also writes the WARC record when WARC capture is enabled.
+
+The extension list is intentionally conservative and will be expanded only as real collections expose additional formats.
+
 ## Tags
 
 `retrocomputing`, `z80`, `z80pack`, `emulator`, `cpm`
 
-## Questions to answer from the first capture
+## Questions to answer from the first clean capture
 
 1. Does the archived z80pack page replay well enough to navigate naturally?
-2. Which downloadable archives and documentation files are captured automatically?
+2. Are downloadable archives such as `zsdos.tgz` preserved intact and accessible from the archive?
 3. Which external links are useful enough that they should become separate archive collections?
-4. Does the default wget/WARC/browser output give enough redundancy for long-term preservation?
+4. Does the wget/WARC/browser combination give enough redundancy for long-term preservation?
 5. How much storage does a representative retrocomputing resource collection consume?
 6. What information is missing that would help explain years later why the collection was saved?
 
 ## Future enhancements suggested by this collection
-
-Do not implement these until the first capture is reviewed:
 
 - Detect and mirror linked Git repositories.
 - Create checksums/manifests for preserved downloads.
