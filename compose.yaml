@@ -12,6 +12,13 @@ services:
       # Retro Archiver is local-first. Do not submit captured URLs to
       # archive.org/Wayback Machine unless explicitly opted in.
       SAVE_ARCHIVE_DOT_ORG: ${SAVE_ARCHIVE_DOT_ORG:-False}
+
+      # Downloadable artifacts are preservation objects, not web pages.
+      # For these URL extensions, skip browser/page-oriented extractors and
+      # preserve the original bytes with headers + wget (which also writes WARC).
+      # Keep this list conservative and extend it as new retro formats appear.
+      SAVE_DENYLIST: >-
+        {"(?i)\\.(zip|tgz|tar\\.gz|tar|gz|bz2|xz|7z|lha|lzh|arc|zoo|arj|img|dsk|imd|td0|hfe|bin|rom|hex|iso|pdf)(?:[?#].*)?$":["favicon","singlefile","pdf","screenshot","dom","title","readability","mercury","htmltotext","git","media","archive_org"]}
     volumes:
       # Keep ArchiveBox DB/config/logs local on the SIMH host.
       - ./data:/data
