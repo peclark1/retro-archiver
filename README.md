@@ -21,7 +21,8 @@ This is a good test because the page is both a useful historical resource and a 
 3. **Keep the first version small.** Use ArchiveBox's existing capture, metadata, WARC, wget, screenshot, and browser tooling before writing custom crawlers.
 4. **Separate metadata from bulk storage.** ArchiveBox's database/config will eventually live on the SIMH host's local disk; large archived payloads will live on TrueNAS/ZFS.
 5. **Do not crawl the Internet indiscriminately.** Captures need explicit depth and size limits, with source-specific strategies later for sites such as Bitsavers.
-6. **GitHub is the source of truth for this project's code and configuration.** Archived third-party content itself does not belong in this repository.
+6. **Local-first preservation.** Captures remain under our control by default. ArchiveBox's automatic submission of every URL to archive.org is disabled unless a collection explicitly opts in.
+7. **GitHub is the source of truth for this project's code and configuration.** Archived third-party content itself does not belong in this repository.
 
 ## Phase 1: local proof of concept
 
@@ -37,6 +38,10 @@ For the first test, keep *all* ArchiveBox data local on the SIMH Ubuntu host. Th
 ### ArchiveBox version
 
 Retro Archiver currently pins ArchiveBox **v0.7.4**, the stable release as of August 2026. The newer v0.9.x line is still prerelease and has a somewhat different CLI/setup flow. We will evaluate it later rather than starting the archive on a development release.
+
+### Privacy / archive.org policy
+
+ArchiveBox v0.7.4 normally enables `SAVE_ARCHIVE_DOT_ORG=True`, which submits captured URLs to the Internet Archive for additional redundancy. Retro Archiver explicitly sets this to **False by default**. A future collection can opt in when an additional public Wayback Machine copy is desirable.
 
 ### Setup
 
